@@ -1,0 +1,47 @@
+version: 2
+jobs:
+  build-site:
+    docker:
+      - image: circleci/node
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: install dependencies
+          command: |
+            yarn install
+      - run:
+          name: create static site
+          command: |
+            yarn generate
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+            - dist
+            - firebase.json
+
+  deploy-site:
+    docker:
+      - image: circleci/node
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Deploy Master to Firebase
+          command: ./node_modules/.bin/firebase deploy --token=$FIREBASE_TOKEN --project=$FIREBASE_PROJECT
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build-site
+      - deploy-site:
+          filters:
+            branches:
+              only: master
+          context: datagusto-frontend
+          requires:
+            - build-site
