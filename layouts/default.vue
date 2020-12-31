@@ -48,7 +48,7 @@
     </v-content>
     <v-footer :fixed="fixed" app>
       <v-spacer></v-spacer>
-      <span>&copy;Datagusto 2020</span>
+      <span>&copy;Datagusto 2021</span>
     </v-footer>
   </v-app>
 </template>
